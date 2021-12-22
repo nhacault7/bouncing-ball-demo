@@ -27,9 +27,15 @@ function loop() {
   ctx.fillRect(0, 0, width, height);          // Draws a rectangle of the color
 
   for (let i = 0; i < balls.length; i++) {
-    balls[i].draw();
-    balls[i].update();
-    balls[i].detectCollision();
+    if (balls[i].exists) {
+      balls[i].draw();
+      balls[i].update();
+      balls[i].detectCollision();
+    }
+    
+    evilBall.draw();
+    evilBall.checkBounds();
+    evilBall.detectCollision();
   }
 
   requestAnimationFrame(loop);
@@ -117,6 +123,77 @@ class Ball extends Shape {
   }
 }
 
+class EvilCircle extends Shape {
+  constructor(x, y, exists) {
+    super(x, y, 20, 20, exists);
+    this.color = 'white';
+    this.size = 10;
+  }
+
+  /**
+   * Draw a ball on the canvas
+   */
+   draw() {
+    ctx.beginPath();                              // State we want to "draw" on canvas
+    ctx.strokeStyle = this.color;                   // Define the color of the shape
+    ctx.lineWidth = 3;
+    ctx.arc(                                      // Draw circle
+      this.x, this.y, this.size, 0, 2 * Math.PI   // 0 = starting degree, 2 * PI = 360 (radians)
+      );                                          
+    ctx.stroke();                                   // State we want to finish "drawing"
+  }
+
+   /**
+   * Checks if touching edge of screen then updates balls position
+   */
+    checkBounds() {
+      if ((this.x + this.size) >= width) {    // if the x coordinate is greater than the width of the canvas
+        this.x -= this.size;             // (the ball is going off the right edge)
+      }
+  
+      if ((this.x - this.size) <= 0) {        // if the x coordinate is smaller than 0
+        this.x += this.size;             // (the ball is going off the left edge)
+      }
+  
+      if ((this.y + this.size) >= height) {   // if the y coordinate is greater than the height of the canvas
+        this.y -= this.size;             // (the ball is going off the bottom edge)
+      }
+    
+      if ((this.y - this.size) <= 0) {        // if the y coordinate is smaller than 0
+        this.y += this.size;             // (the ball is going off the top edge)
+      }
+    }
+
+    setControls() {
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'a') {
+          this.x -= this.velX;
+        } else if (e.key === 'd') {
+          this.x += this.velX;
+        } else if (e.key === 'w') {
+          this.y -= this.velY;
+        } else if (e.key === 's') {
+          this.y += this.velY;
+        }
+      })
+    }
+
+    detectCollision() {
+      for (let i = 0; i < balls.length; i++) {
+        if (balls[i].exists) {
+          const dx = this.x - balls[i].x;
+          const dy = this.y - balls[i].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+    
+          if (distance < this.size + balls[i].size) {
+            balls[i].color = 'black';
+            balls[i].exists = false;
+          }
+        }
+      }
+    }
+}
+
 let balls = [];
 
 while (balls.length < 25) {
@@ -135,5 +212,13 @@ while (balls.length < 25) {
 
   balls.push(ball);
 }
+
+let size = random(10, 20);
+const evilBall = new EvilCircle(
+  random(0 + size, width - size),            
+  random(0 + size, height - size),
+  true
+)
+evilBall.setControls();
 
 loop();
