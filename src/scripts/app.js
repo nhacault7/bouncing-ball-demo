@@ -11,21 +11,32 @@ const height = canvas.height = window.innerHeight;
 const ballCountEl = document.querySelector('P');
 let ballCount = 0;
 
-// function to generate random number
-
+/**
+ * Generate random number
+ * 
+ * @param {number} min Minimum number in range
+ * @param {number} max Maximum number in range
+ * @returns Random number between min and max
+ */
 function random(min, max) {
   const num = Math.floor(Math.random() * (max - min + 1)) + min;
   return num;
 }
 
-// function to generate random RGB color
-
+/**
+ * Generate Random RGB color
+ * 
+ * @returns RGB color, in RGB string format
+ */
 function randomColor() {
   return `rgb(${random(0, 255)},${random(0, 255)},${random(0, 255)})`
 }
 
-// function to update ball count
-
+/**
+ * Update Ball Count
+ * 
+ * @param {boolean} addCount true (added), false (subtracted)
+ */
 function updateBallCount(addCount) {
   if (addCount) {
     ballCountEl.innerHTML = `Ball Count: ${++ballCount}`;
@@ -34,8 +45,9 @@ function updateBallCount(addCount) {
   }
 }
 
-// Recursive animation loop function
-
+/**
+ * Recursive animation loop
+ */
 function loop() {
   // called every frame to cover ball position in previous frame
   ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';      // Set the canvas fill color
@@ -66,7 +78,7 @@ class Shape {
   }
 
   /**
-   * Draw a ball on the canvas
+   * Draw a circle on the canvas
    */
    draw() {
     ctx.beginPath();                              // State we want to "draw" on canvas
@@ -78,29 +90,32 @@ class Shape {
   }
   
   /**
-   * Checks if touching edge of screen then updates balls position
+   * Checks if shape is touching edge of screen then updates shapes position
    */
   update() {
     if ((this.x + this.size) >= width) {    // if the x coordinate is greater than the width of the canvas
-      this.velX = -(this.velX);             // (the ball is going off the right edge)
+      this.velX = -(this.velX);             // (the shape is going off the right edge)
     }
 
     if ((this.x - this.size) <= 0) {        // if the x coordinate is smaller than 0
-      this.velX = -(this.velX);             // (the ball is going off the left edge)
+      this.velX = -(this.velX);             // (the shape is going off the left edge)
     }
 
     if ((this.y + this.size) >= height) {   // if the y coordinate is greater than the height of the canvas
-      this.velY = -(this.velY);             // (the ball is going off the bottom edge)
+      this.velY = -(this.velY);             // (the shape is going off the bottom edge)
     }
   
     if ((this.y - this.size) <= 0) {        // if the y coordinate is smaller than 0
-      this.velY = -(this.velY);             // (the ball is going off the top edge)
+      this.velY = -(this.velY);             // (the shape is going off the top edge)
     }
   
     this.x += this.velX;
     this.y += this.velY;
   }
 
+  /**
+   * Checks for shape collision
+   */
   detectCollision() {
     for (let i = 0; i < balls.length; i++) {
       if (!(this === balls[i])) {
@@ -123,6 +138,9 @@ class Ball extends Shape {
     this.size = size;  
   }
 
+  /**
+   * Checks for Ball collision
+   */
   detectCollision() {
     for (let i = 0; i < balls.length; i++) {
       if (!(this === balls[i]) && balls[i].exists) {
@@ -146,68 +164,74 @@ class Player extends Shape {
   }
 
   /**
-   * Draw a ball on the canvas
+   * Draw a circle on the canvas
    */
    draw() {
     ctx.beginPath();                              // State we want to "draw" on canvas
-    ctx.strokeStyle = this.color;                   // Define the color of the shape
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = this.color;                 // Define the stroke color of the circle
+    ctx.lineWidth = 3;                            // Define line width of outline stroke
     ctx.arc(                                      // Draw circle
       this.x, this.y, this.size, 0, 2 * Math.PI   // 0 = starting degree, 2 * PI = 360 (radians)
       );                                          
-    ctx.stroke();                                   // State we want to finish "drawing"
+    ctx.stroke();                                 // State we want to finish "drawing"
   }
 
-   /**
-   * Checks if touching edge of screen then updates balls position
+  /**
+  * Checks if player is touching edge of screen
+  */
+  checkBounds() {
+    if ((this.x + this.size) >= width) {    // if the x coordinate is greater than the width of the canvas
+      this.x -= this.size;                  // (the ball is going off the right edge)
+    }
+  
+    if ((this.x - this.size) <= 0) {        // if the x coordinate is smaller than 0
+      this.x += this.size;                  // (the ball is going off the left edge)
+    }
+  
+    if ((this.y + this.size) >= height) {   // if the y coordinate is greater than the height of the canvas
+      this.y -= this.size;                  // (the ball is going off the bottom edge)
+    }
+    
+    if ((this.y - this.size) <= 0) {        // if the y coordinate is smaller than 0
+      this.y += this.size;                  // (the ball is going off the top edge)
+    }
+  }
+
+  /**
+   * create eventListener for player Controls
    */
-    checkBounds() {
-      if ((this.x + this.size) >= width) {    // if the x coordinate is greater than the width of the canvas
-        this.x -= this.size;             // (the ball is going off the right edge)
+  setControls() {
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'a') {
+        this.x -= this.velX;
+      } else if (e.key === 'd') {
+        this.x += this.velX;
+      } else if (e.key === 'w') {
+        this.y -= this.velY;
+      } else if (e.key === 's') {
+        this.y += this.velY;
       }
-  
-      if ((this.x - this.size) <= 0) {        // if the x coordinate is smaller than 0
-        this.x += this.size;             // (the ball is going off the left edge)
-      }
-  
-      if ((this.y + this.size) >= height) {   // if the y coordinate is greater than the height of the canvas
-        this.y -= this.size;             // (the ball is going off the bottom edge)
-      }
-    
-      if ((this.y - this.size) <= 0) {        // if the y coordinate is smaller than 0
-        this.y += this.size;             // (the ball is going off the top edge)
-      }
-    }
+    });
+  }
 
-    setControls() {
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'a') {
-          this.x -= this.velX;
-        } else if (e.key === 'd') {
-          this.x += this.velX;
-        } else if (e.key === 'w') {
-          this.y -= this.velY;
-        } else if (e.key === 's') {
-          this.y += this.velY;
-        }
-      });
-    }
-
-    detectCollision() {
-      for (let i = 0; i < balls.length; i++) {
-        if (balls[i].exists) {
-          const dx = this.x - balls[i].x;
-          const dy = this.y - balls[i].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+  /**
+   * Checks for player/ball collision
+   */
+  detectCollision() {
+    for (let i = 0; i < balls.length; i++) {
+      if (balls[i].exists) {
+        const dx = this.x - balls[i].x;
+        const dy = this.y - balls[i].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
     
-          if (distance < this.size + balls[i].size) {
-            balls[i].color = 'black';
-            balls[i].exists = false;
-            updateBallCount(false);
-          }
+        if (distance < this.size + balls[i].size) {
+          balls[i].color = 'black';
+          balls[i].exists = false;
+          updateBallCount(false);
         }
       }
     }
+  }
 }
 
 let balls = [];
