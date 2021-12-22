@@ -35,20 +35,19 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-class Ball {
-  constructor(x, y, velX, velY, color, size) {
+class Shape {
+  constructor(x, y, velX, velY, exists) {
     this.x = x;             // Starting horizontal position
     this.y = y;             // Starting vertical position
     this.velX = velX;       // Horizontal velocity
     this.velY = velY;       // Vertical velocity
-    this.color = color;     // Ball color
-    this.size = size;       // Ball size
+    this.exists = exists;
   }
 
   /**
    * Draw a ball on the canvas
    */
-  draw() {
+   draw() {
     ctx.beginPath();                              // State we want to "draw" on canvas
     ctx.fillStyle = this.color;                   // Define the color of the shape
     ctx.arc(                                      // Draw circle
@@ -96,6 +95,28 @@ class Ball {
   }
 }
 
+class Ball extends Shape {
+  constructor(x, y, velX, velY, exists, color, size) {
+    super(x, y, velX, velY, exists);
+    this.color = color;   
+    this.size = size;  
+  }
+
+  detectCollision() {
+    for (let i = 0; i < balls.length; i++) {
+      if (!(this === balls[i]) && balls[i].exists) {
+        const dx = this.x - balls[i].x;
+        const dy = this.y - balls[i].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+  
+        if (distance < this.size + balls[i].size) {
+          balls[i].color = this.color = randomColor();
+        }
+      }
+    }
+  }
+}
+
 let balls = [];
 
 while (balls.length < 25) {
@@ -106,7 +127,8 @@ while (balls.length < 25) {
     random(0 + size, width - size),            
     random(0 + size, height - size),           
     random(-7, 7),                                                
-    random(-7, 7),                                                
+    random(-7, 7),
+    true,                                                
     randomColor(), 
     size,                                               
   );
