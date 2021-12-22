@@ -6,6 +6,11 @@ const ctx = canvas.getContext('2d');
 const width = canvas.width = window.innerWidth;
 const height = canvas.height = window.innerHeight;
 
+// setup ball count
+
+const ballCountEl = document.querySelector('P');
+let ballCount = 0;
+
 // function to generate random number
 
 function random(min, max) {
@@ -17,6 +22,16 @@ function random(min, max) {
 
 function randomColor() {
   return `rgb(${random(0, 255)},${random(0, 255)},${random(0, 255)})`
+}
+
+// function to update ball count
+
+function updateBallCount(addCount) {
+  if (addCount) {
+    ballCountEl.innerHTML = `Ball Count: ${++ballCount}`;
+  } else {
+    ballCountEl.innerHTML = `Ball Count: ${--ballCount}`;
+  }
 }
 
 // Recursive animation loop function
@@ -175,7 +190,7 @@ class Player extends Shape {
         } else if (e.key === 's') {
           this.y += this.velY;
         }
-      })
+      });
     }
 
     detectCollision() {
@@ -188,6 +203,7 @@ class Player extends Shape {
           if (distance < this.size + balls[i].size) {
             balls[i].color = 'black';
             balls[i].exists = false;
+            updateBallCount(false);
           }
         }
       }
@@ -211,6 +227,7 @@ while (balls.length < 25) {
   );
 
   balls.push(ball);
+  updateBallCount(true);
 }
 
 let size = random(10, 20);
