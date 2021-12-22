@@ -13,6 +13,21 @@ function random(min, max) {
   return num;
 }
 
+// Recursive animation loop function
+
+function loop() {
+  // called every frame to cover ball position in previous frame
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';      // Set the canvas fill color
+  ctx.fillRect(0, 0, width, height);          // Draws a rectangle of the color
+
+  for (let i = 0; i < balls.length; i++) {
+    balls[i].draw();
+    balls[i].update();
+  }
+
+  requestAnimationFrame(loop);
+}
+
 class Ball {
   constructor(x, y, velX, velY, color, size) {
     this.x = x;             // Starting horizontal position
@@ -77,3 +92,5 @@ while (balls.length < 25) {
 
   balls.push(ball);
 }
+
+loop();
