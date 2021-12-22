@@ -33,9 +33,9 @@ function loop() {
       balls[i].detectCollision();
     }
     
-    evilBall.draw();
-    evilBall.checkBounds();
-    evilBall.detectCollision();
+    player.draw();
+    player.checkBounds();
+    player.detectCollision();
   }
 
   requestAnimationFrame(loop);
@@ -123,7 +123,7 @@ class Ball extends Shape {
   }
 }
 
-class EvilCircle extends Shape {
+class Player extends Shape {
   constructor(x, y, exists) {
     super(x, y, 20, 20, exists);
     this.color = 'white';
@@ -214,11 +214,12 @@ while (balls.length < 25) {
 }
 
 let size = random(10, 20);
-const evilBall = new EvilCircle(
+const player = new Player (
   random(0 + size, width - size),            
   random(0 + size, height - size),
-  true
+  true,
 )
-evilBall.setControls();
+
+player.setControls();
 
 loop();
