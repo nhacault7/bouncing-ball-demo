@@ -13,6 +13,12 @@ function random(min, max) {
   return num;
 }
 
+// function to generate random RGB color
+
+function randomColor() {
+  return `rgb(${random(0, 255)},${random(0, 255)},${random(0, 255)})`
+}
+
 // Recursive animation loop function
 
 function loop() {
@@ -83,7 +89,7 @@ class Ball {
         const distance = Math.sqrt(dx * dx + dy * dy);
   
         if (distance < this.size + balls[i].size) {
-          balls[i].color = this.color = `rgb(${random(0, 255)},${random(0, 255)},${random(0, 255)})`;
+          balls[i].color = this.color = randomColor();
         }
       }
     }
@@ -101,7 +107,7 @@ while (balls.length < 25) {
     random(0 + size, height - size),           
     random(-7, 7),                                                
     random(-7, 7),                                                
-    `rgb(${random(0, 255)},${random(0, 255)},${random(0, 255)})`, 
+    randomColor(), 
     size,                                               
   );
 
