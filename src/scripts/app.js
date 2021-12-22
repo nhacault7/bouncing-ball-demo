@@ -23,6 +23,7 @@ function loop() {
   for (let i = 0; i < balls.length; i++) {
     balls[i].draw();
     balls[i].update();
+    balls[i].detectCollision();
   }
 
   requestAnimationFrame(loop);
@@ -72,6 +73,20 @@ class Ball {
   
     this.x += this.velX;
     this.y += this.velY;
+  }
+
+  detectCollision() {
+    for (let i = 0; i < balls.length; i++) {
+      if (!(this === balls[i])) {
+        const dx = this.x - balls[i].x;
+        const dy = this.y - balls[i].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+  
+        if (distance < this.size + balls[i].size) {
+          balls[i].color = this.color = `rgb(${random(0, 255)},${random(0, 255)},${random(0, 255)})`;
+        }
+      }
+    }
   }
 }
 
